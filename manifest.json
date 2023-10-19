@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "PSNP Extra",
+  "version": "1.0",
+  "description": "Add additional features to PSNProfiles.com",
+  "content_scripts": [
+    {
+      "matches": ["*://*.psnprofiles.com/*"],
+      "js": ["bundle.js"]
+    }
+  ],
+  "action": {},
+  "host_permissions": ["*://*.psnprofiles.com/*"]
+}
