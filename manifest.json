@@ -10,5 +10,11 @@
     }
   ],
   "action": {},
-  "host_permissions": ["*://*.psnprofiles.com/*"]
+  "permissions": ["storage"],
+  "host_permissions": ["*://*.psnprofiles.com/*"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "psnpe@trophycollectors.net"
+    }
+  }
 }
