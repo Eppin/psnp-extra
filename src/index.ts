@@ -1,20 +1,13 @@
-let message: string = "Hello Worldw";
-console.log(message);
+import { DropdownMenu } from "./components/dropdown-menu";
+import { GuideModule } from "./modules/guide-module";
 
-const currentUrl = window.location.href;
-console.log(currentUrl); 
+console.debug("Starting PSNProfiles Extra");
 
-if (currentUrl === "https://psnprofiles.com/VileTung")
-{
-  import('./foo');
-}
-else
-{
-  import('./foo2')
-}
+const dropdownMenu = new DropdownMenu();
+dropdownMenu.addSettingsButton();
 
-const updateFind = document.getElementById("update-find");
-const p = document.createElement("p");
-p.textContent = "Hello WOrld";
+// document.getElementsByTagName('body')[0].appendChild(new PopupControl().node);
 
-updateFind?.appendChild(p);
+new GuideModule().getGuideUrl();
+
+console.debug("Started PSNProfiles Extra");
