@@ -6,8 +6,8 @@ console.debug("Starting PSNProfiles Extra");
 const dropdownMenu = new DropdownMenu();
 dropdownMenu.addSettingsButton();
 
-// document.getElementsByTagName('body')[0].appendChild(new PopupControl().node);
-
-new GuideModule().getGuideUrl();
+const guideModule = new GuideModule();
+const guide = await guideModule.getGuide();
+console.log(guide);
 
 console.debug("Started PSNProfiles Extra");

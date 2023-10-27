@@ -86,7 +86,7 @@ export class PopupControl extends BaseControl {
             .append(new BaseControl(document.createElement('a'))
               .setClass('close')
               .setAttribute('href', '#')
-              .click(_ => this.node.parentElement.remove())
+              .click(_ => this.node.parentElement?.remove())
               .append(new BaseControl(document.createElement('img'))
                 .setAttribute('src', '/lib/img/layout/close.png')
                 .setAttribute('title', 'close')
