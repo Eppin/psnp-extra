@@ -15,7 +15,6 @@
     "camelcase": 1,
     "computed-property-spacing": ["error", "never"],
     "eol-last": ["error", "always"],
-    "indent": ["error", 2],
     "keyword-spacing": "error",
     "no-extend-native": "error",
     "no-mixed-spaces-and-tabs": "error",
