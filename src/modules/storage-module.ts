@@ -15,4 +15,14 @@ export class StorageModule {
       }
     }
   }
+
+  public getGuides (trophyId: number): Guide[] {
+    const guidesStr = localStorage.getItem(this.guidesKey);
+    if (guidesStr === null) {
+      return [];
+    }
+
+    const guides: Guide[] = JSON.parse(guidesStr);
+    return guides.filter((g) => g.trophyId === trophyId);
+  }
 }

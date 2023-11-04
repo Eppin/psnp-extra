@@ -1,12 +1,21 @@
 export class BaseControl {
   node: HTMLElement;
 
-  constructor (node: HTMLElement) {
-    this.node = node;
+  constructor (node: HTMLElement | string) {
+    if (typeof node === 'string') {
+      this.node = document.createElement(node);
+    } else {
+      this.node = node;
+    }
   }
 
-  public append (basePanel: BaseControl): BaseControl {
-    this.node.append(basePanel.node);
+  public append (basePanel: BaseControl | string): BaseControl {
+    if (typeof basePanel === 'string') {
+      this.node.append(basePanel);
+    } else {
+      this.node.append(basePanel.node);
+    }
+
     return this;
   }
 
