@@ -1,17 +1,22 @@
 {
-  "manifest_version": 3,
+  "manifest_version": "<-- auto-filled -->",
+
   "name": "PSNP Extra",
-  "version": "1.0",
-  "description": "Add additional features to PSNProfiles.com",
+  "version": "<-- auto-filled -->",
+  "description": "<-- auto-filled -->",
+  "author": "<-- auto-filled; do not edit -->",
+
   "content_scripts": [
     {
       "matches": ["*://*.psnprofiles.com/*"],
       "js": ["bundle.js"]
     }
   ],
+
   "action": {},
   "permissions": ["storage"],
   "host_permissions": ["*://*.psnprofiles.com/*"],
+
   "browser_specific_settings": {
     "gecko": {
       "id": "psnpe@trophycollectors.net"
