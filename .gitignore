@@ -1,5 +1,6 @@
 ### Webpack ###
 **/dist/**
+**/build/**
 
 # Created by https://www.toptal.com/developers/gitignore/api/linux,windows,macos,visualstudiocode,visualstudio,notepadpp
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,windows,macos,visualstudiocode,visualstudio,notepadpp

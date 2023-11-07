@@ -9,8 +9,8 @@ export class DropdownMenu {
         return;
       }
 
-      node.appendAfter(new BaseControl(document.createElement('li'))
-        .append(new BaseControl(document.createElement('a'))
+      node.appendAfter(new BaseControl('li')
+        .append(new BaseControl('a')
           .setInnerText('Plugin Settings')
           .setAttribute('href', '#')
           .click((_) => { this.openPopup(); })));
@@ -23,7 +23,7 @@ export class DropdownMenu {
 
   private openPopup (): void {
     new BaseControl(document.getElementsByTagName('body')[0])
-      .append(new BaseControl(document.createElement('div'))
+      .append(new BaseControl('div')
         .append(new PopupControl())
         .append(new PopupOverlay()));
   }

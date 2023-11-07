@@ -19,6 +19,12 @@ if (paths.length >= 1) {
       break;
     }
 
+    case 'guide': {
+      const guideModule = new GuideModule();
+      guideModule.makeCheckable();
+      break;
+    }
+
     case '': {
       console.log('Main page');
       break;

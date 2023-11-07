@@ -41,7 +41,12 @@ export class BaseControl {
   }
 
   public setClass (..._class: string[]): BaseControl {
-    this.node.setAttribute('class', _class.join(' '));
+    _class.forEach((c) => { this.node.classList.add(c); });
+    return this;
+  }
+
+  public removeClass (style: string): BaseControl {
+    this.node.classList.remove(style);
     return this;
   }
 
@@ -63,40 +68,40 @@ export class BaseControl {
 
 export class TitleControl extends BaseControl {
   constructor (title: string) {
-    super(document.createElement('div'));
+    super('div');
 
     this
       .setClass('title-bar', 'flex', 'v-align')
-      .append(new BaseControl(document.createElement('div'))
+      .append(new BaseControl('div')
         .setClass('grow')
-        .append(new BaseControl(document.createElement('h3'))
+        .append(new BaseControl('h3')
           .setInnerText(title)));
   }
 }
 
 export class PopupControl extends BaseControl {
   constructor () {
-    super(document.createElement('div'));
+    super('div');
 
     this
       .setId('facebox')
       .setStyle('top: 50px')
-      .append(new BaseControl(document.createElement('div'))
+      .append(new BaseControl('div')
         .setClass('popup')
-        .append(new BaseControl(document.createElement('div'))
+        .append(new BaseControl('div')
           .setClass('content')
           .append(new TitleControl('Plugin settings')))
-        .append(new BaseControl(document.createElement('div'))
+        .append(new BaseControl('div')
           .setId('loadingCover')
-          .append(new BaseControl(document.createElement('center'))
+          .append(new BaseControl('center')
             .setStyle('margin-top: 150px')
-            .append(new BaseControl(document.createElement('div'))
+            .append(new BaseControl('div')
               .setClass('fancy-loader', 'dark', 'large'))))
-        .append(new BaseControl(document.createElement('a'))
+        .append(new BaseControl('a')
           .setClass('close')
           .setAttribute('href', '#')
           .click((_) => this.node.parentElement?.remove())
-          .append(new BaseControl(document.createElement('img'))
+          .append(new BaseControl('img')
             .setAttribute('src', '/lib/img/layout/close.png')
             .setAttribute('title', 'close')
             .setClass('close_image'))));

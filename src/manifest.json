@@ -9,7 +9,8 @@
   "content_scripts": [
     {
       "matches": ["*://*.psnprofiles.com/*"],
-      "js": ["bundle.js"]
+      "js": ["bundle.js"],
+      "css": ["main.css", "overwrite.css"]
     }
   ],
 
