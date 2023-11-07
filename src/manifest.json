@@ -1,0 +1,26 @@
+{
+  "manifest_version": "<-- auto-filled -->",
+
+  "name": "PSNP Extra",
+  "version": "<-- auto-filled -->",
+  "description": "<-- auto-filled -->",
+  "author": "<-- auto-filled; do not edit -->",
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.psnprofiles.com/*"],
+      "js": ["bundle.js"],
+      "css": ["main.css", "overwrite.css"]
+    }
+  ],
+
+  "action": {},
+  "permissions": ["storage"],
+  "host_permissions": ["*://*.psnprofiles.com/*"],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "psnpe@trophycollectors.net"
+    }
+  }
+}

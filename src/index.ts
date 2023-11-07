@@ -1,20 +1,44 @@
-let message: string = "Hello Worldw";
-console.log(message);
+import { DropdownMenu } from './components/dropdown-menu';
+import { GuideModule } from './modules/guide-module';
+import { ProfileGameModule } from './modules/profile-game-module';
+import { StorageModule } from './modules/storage-module';
 
-const currentUrl = window.location.href;
-console.log(currentUrl); 
+console.log('Starting PSNProfiles Extra');
 
-if (currentUrl === "https://psnprofiles.com/VileTung")
-{
-  import('./foo');
+const paths = location.pathname.split('/');
+if (paths.length >= 1) {
+  switch (paths[1]) {
+    case 'trophies': {
+      const guideModule = new GuideModule();
+      const guide = await guideModule.getGuide();
+
+      if (guide !== undefined) {
+        const storageModule = new StorageModule();
+        storageModule.saveGuide(guide);
+      }
+      break;
+    }
+
+    case 'guide': {
+      const guideModule = new GuideModule();
+      guideModule.makeCheckable();
+      break;
+    }
+
+    case '': {
+      console.log('Main page');
+      break;
+    }
+
+    default: {
+      console.log('Profile page');
+      const profileGameModule = new ProfileGameModule();
+      profileGameModule.setGuides();
+    }
+  }
 }
-else
-{
-  import('./foo2')
-}
 
-const updateFind = document.getElementById("update-find");
-const p = document.createElement("p");
-p.textContent = "Hello WOrld";
+const dropdownMenu = new DropdownMenu();
+dropdownMenu.addSettingsButton();
 
-updateFind?.appendChild(p);
+console.log('Started PSNProfiles Extra');

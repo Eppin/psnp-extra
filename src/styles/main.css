@@ -1,0 +1,12 @@
+.psnp-e-checkable {
+  cursor: pointer;
+}
+
+.psnp-e-checked {
+  text-decoration: line-through;
+  color: lightgray;
+}
+
+.psnp-e-checked > td {
+  color: lightgray !important;
+}

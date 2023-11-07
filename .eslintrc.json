@@ -1,0 +1,28 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": ["standard-with-typescript"],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+    "@typescript-eslint/semi": ["error", "always"],
+    "array-bracket-newline": ["error", "consistent"],
+    "array-bracket-spacing": ["error", "always"],
+    "arrow-parens": ["error", "always"],
+    "camelcase": 1,
+    "computed-property-spacing": ["error", "never"],
+    "eol-last": ["error", "always"],
+    "keyword-spacing": "error",
+    "no-extend-native": "error",
+    "no-mixed-spaces-and-tabs": "error",
+    "no-trailing-spaces": "error",
+    "no-unused-vars": "error",
+    "no-use-before-define": ["error", "nofunc"],
+    "object-curly-spacing": ["error", "always"],
+    "quotes": ["error", "single"],
+    "space-unary-ops": 2
+  }
+}
