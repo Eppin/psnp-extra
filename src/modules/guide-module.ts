@@ -1,3 +1,6 @@
+import { BaseControl, TitleControl } from '../components/base-control';
+import { FormCheckboxControl } from '../components/form-checkbox-control';
+import { FormControl } from '../components/form-control';
 import { GuideCheckableControl } from '../components/guide-checkable';
 import { type Guide } from '../models/guide';
 
@@ -77,6 +80,15 @@ export class GuideModule {
       .body;
   }
 
+  public addSettings (): void {
+    const element = document.querySelector('.game-image-holder + .box') as HTMLElement;
+    new BaseControl(element)
+      .appendAfter(new TitleControl('Settings'))
+      .next()
+      .appendAfter(new FormControl()
+        .add(new FormCheckboxControl('psnp-e-hide-earned', 'Hide earned trophies', (e) => { this.changeEarned((e.target as HTMLInputElement).checked); })));
+  }
+
   public makeCheckable (): void {
     const guideId = /(\d+)/.exec(window.location.href)?.[0];
 
@@ -93,5 +105,88 @@ export class GuideModule {
         const guideCheckableControl = new GuideCheckableControl(element as HTMLElement, parseInt(guideId), index);
         guideCheckableControl.load();
       });
+  }
+
+  public changeEarned (hide: boolean): void {
+    // Earned trophies
+    const trophyUrls: string[] = [];
+
+    document.querySelectorAll('img.trophy.earned').forEach((e) => {
+      const parent = this.findParent(e as HTMLElement, ':not(.box).section-holder');
+      const sectionId = parent?.firstElementChild?.id;
+
+      if (sectionId !== undefined) {
+        trophyUrls.push(sectionId);
+      }
+    });
+
+    // Overview
+    document.querySelectorAll('div.guide.overview a[href]').forEach((e) => {
+      if (trophyUrls.some((t) => e.attributes.getNamedItem('href')?.value.includes(t))) {
+        if (hide) {
+          e.setAttribute('style', 'display:none');
+        } else if (e != null) {
+          (e as HTMLElement).style.display = '';
+        }
+      }
+    });
+
+    // Roadmap
+    document.querySelectorAll('div.trophy.earned').forEach((e) => {
+      const parent = this.findParent(e as HTMLElement, '.col-xs-6, .col-xs-12');
+
+      if (hide) {
+        parent?.setAttribute('style', 'display:none');
+      } else if (parent != null) {
+        parent.style.display = '';
+      }
+    });
+
+    // Section
+    document.querySelectorAll('img.trophy.earned').forEach((e) => {
+      const parent = this.findParent(e as HTMLElement, ':not(.box).section-holder');
+
+      if (hide) {
+        parent?.setAttribute('style', 'display:none');
+      } else if (parent != null) {
+        parent.style.display = '';
+      }
+    });
+
+    // Text
+    document.querySelectorAll('a:not(icon-sprite.trophy)').forEach((e) => {
+      if (trophyUrls.some((t) => e.attributes.getNamedItem('href')?.value.includes(t))) {
+        if (hide) {
+          e.classList.add('psnp-e-checked');
+        } else {
+          e.classList.remove('psnp-e-checked');
+        }
+      }
+    });
+
+    // Tree
+    document
+      .querySelectorAll('ul.tableofcontents > li.ellipsis.earned')
+      .forEach((e) => {
+        if (hide) {
+          e?.setAttribute('style', 'display:none');
+        } else if (e != null) {
+          (e as HTMLElement).style.display = '';
+        }
+      });
+  }
+
+  private findParent (element: HTMLElement, query: string): HTMLElement | null {
+    while (true) {
+      if (element.parentElement?.querySelector(query) != null) {
+        return element;
+      }
+
+      if (element.parentElement == null) {
+        return null;
+      }
+
+      element = element.parentElement;
+    }
   }
 }

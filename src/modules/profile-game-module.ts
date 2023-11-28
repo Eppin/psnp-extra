@@ -71,6 +71,6 @@ export class ProfileGameModule {
   private guideElement (value: string, color: string): BaseControl {
     return new BaseControl('span')
       .setInnerText(value)
-      .setStyle(color, 'color: #fff', 'padding: 0 2px', 'border-radius: 2px')
+      .setStyle(color, 'color: #fff', 'padding: 0 2px', 'border-radius: 2px');
   }
 }

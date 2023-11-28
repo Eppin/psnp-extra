@@ -24,8 +24,23 @@ export class BaseControl {
     return this;
   }
 
-  public click (callback: (ev: MouseEvent) => any): BaseControl {
+  public next (): BaseControl {
+    const nextElement = this.node.nextElementSibling;
+
+    if (nextElement !== null) {
+      this.node = nextElement as HTMLElement;
+    }
+
+    return this;
+  }
+
+  public click (callback: (ev: Event) => any): BaseControl {
     this.node.addEventListener('click', callback);
+    return this;
+  }
+
+  public onChange (callback: (ev: Event) => any): BaseControl {
+    this.node.addEventListener('change', callback);
     return this;
   }
 
@@ -66,7 +81,7 @@ export class BaseControl {
   }
 }
 
-export class TitleControl extends BaseControl {
+export class TitleBarControl extends BaseControl {
   constructor (title: string) {
     super('div');
 
@@ -76,6 +91,20 @@ export class TitleControl extends BaseControl {
         .setClass('grow')
         .append(new BaseControl('h3')
           .setInnerText(title)));
+  }
+}
+
+export class TitleControl extends BaseControl {
+  constructor (title: string) {
+    super('div');
+
+    this
+      .setClass('title', 'flex', 'v-align')
+      .append(new BaseControl('h3')
+        .setClass('grow')
+        .setInnerText(title));
+
+    console.log(this.node);
   }
 }
 
@@ -90,7 +119,7 @@ export class PopupControl extends BaseControl {
         .setClass('popup')
         .append(new BaseControl('div')
           .setClass('content')
-          .append(new TitleControl('Plugin settings')))
+          .append(new TitleBarControl('Plugin settings')))
         .append(new BaseControl('div')
           .setId('loadingCover')
           .append(new BaseControl('center')

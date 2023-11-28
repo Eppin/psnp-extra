@@ -22,6 +22,7 @@ if (paths.length >= 1) {
     case 'guide': {
       const guideModule = new GuideModule();
       guideModule.makeCheckable();
+      guideModule.addSettings();
       break;
     }
 
