@@ -1,10 +1,20 @@
 import { BaseControl, TitleControl } from '../components/base-control';
+import { FormButtonControl } from '../components/form-button-control';
+import { FormButtonGroupControl } from '../components/form-button-group-control';
 import { FormCheckboxControl } from '../components/form-checkbox-control';
 import { FormControl } from '../components/form-control';
+import { FormSelectControl } from '../components/form-select-control';
 import { GuideCheckableControl } from '../components/guide-checkable';
 import { type Guide } from '../models/guide';
+import { StorageModule } from './storage-module';
 
 export class GuideModule {
+  private readonly storageModule: StorageModule;
+
+  constructor () {
+    this.storageModule = new StorageModule();
+  }
+
   public async getGuide (): Promise<Guide | undefined> {
     const trophyId = /(\d+)/.exec(window.location.href)?.[0];
 
@@ -87,6 +97,33 @@ export class GuideModule {
       .next()
       .appendAfter(new FormControl()
         .add(new FormCheckboxControl('psnp-e-hide-earned', 'Hide earned trophies', (e) => { this.changeEarned((e.target as HTMLInputElement).checked); })));
+  }
+
+  public addTrophyLoader (): void {
+    const currentGameElement = document.querySelector('.guide-info ~ div.title-bar.flex.v-align > h3 > a:last-of-type');
+    if (currentGameElement === null) {
+      console.warn('Unable to detect current trophy title');
+      return;
+    }
+
+    const currentGame = (currentGameElement as HTMLElement).innerText;
+
+    const control = new FormSelectControl('psnp-e-load-trophies', 'Load trophies', (e) => { console.log((e.target as HTMLInputElement).value); }, true);
+
+    for (const game of this.storageModule.getGames()) {
+      if (game.title.localeCompare(currentGame, undefined, { sensitivity: 'accent' }) === 0) {
+        control.addOption(`psnp-load-${game.trophyId}`, game.title);
+      }
+    }
+
+    const element = document.querySelector('.game-image-holder + .box') as HTMLElement;
+    new BaseControl(element)
+      .appendAfter(new TitleControl('Load other platform'))
+      .next()
+      .appendAfter(new FormControl()
+        .add(control)
+        .add(new FormButtonGroupControl()
+          .addSingleButton(new FormButtonControl('Load trophies', 'green', (e) => { console.log(e); console.log(control.getValue()); }))));
   }
 
   public makeCheckable (): void {

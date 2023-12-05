@@ -22,6 +22,7 @@ if (paths.length >= 1) {
     case 'guide': {
       const guideModule = new GuideModule();
       guideModule.makeCheckable();
+      guideModule.addTrophyLoader();
       guideModule.addSettings();
       break;
     }
@@ -34,6 +35,7 @@ if (paths.length >= 1) {
     default: {
       console.log('Profile page');
       const profileGameModule = new ProfileGameModule();
+      profileGameModule.setGames();
       profileGameModule.setGuides();
     }
   }

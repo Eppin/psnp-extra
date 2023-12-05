@@ -1,9 +1,33 @@
+import { type Game } from '../models/game';
 import { type Guide } from '../models/guide';
 import { type GuideChecked } from '../models/guide-checked';
 
 export class StorageModule {
+  private readonly gamesKey: string = 'psnp-games';
   private readonly guidesKey: string = 'psnp-guides';
   private readonly guidesCheckedKey: string = 'psnp-guides-checked';
+
+  public saveGame (game: Game): void {
+    const gamesStr = localStorage.getItem(this.gamesKey);
+    if (gamesStr === null) {
+      localStorage.setItem(this.gamesKey, JSON.stringify([ game ]));
+    } else {
+      const list: Game[] = JSON.parse(gamesStr);
+      if (!list.some((g) => g.trophyId === game.trophyId)) {
+        list.push(game);
+        localStorage.setItem(this.gamesKey, JSON.stringify(list));
+      }
+    }
+  }
+
+  public getGames (): Game[] {
+    const gamesStr = localStorage.getItem(this.gamesKey);
+    if (gamesStr === null) {
+      return [];
+    }
+
+    return JSON.parse(gamesStr);
+  }
 
   public saveGuide (guide: Guide): void {
     const guidesStr = localStorage.getItem(this.guidesKey);

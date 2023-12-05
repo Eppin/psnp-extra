@@ -1,4 +1,6 @@
 import { BaseControl } from '../components/base-control';
+import { type Game } from '../models/game';
+import { Platform } from '../models/platform';
 import { StorageModule } from './storage-module';
 
 export class ProfileGameModule {
@@ -8,24 +10,78 @@ export class ProfileGameModule {
     this.storageModule = new StorageModule();
   }
 
-  getList (): string[] {
-    const elements = document.querySelectorAll('#gamesTable > tbody a.title');
+  setGames (): void {
+    const e2 = document.querySelectorAll('#gamesTable > tbody tr');
 
-    const games: string[] = [];
-    for (const element of elements) {
-      const href = element.attributes.getNamedItem('href');
+    for (const e of e2) {
+      const platforms: Platform[] = [];
 
-      if (href === null) {
-        continue;
+      for (const platform of e.querySelectorAll('td span.tag.platform')) {
+        switch ((platform as HTMLElement).innerText.toUpperCase()) {
+          case 'VITA':
+            platforms.push(Platform.PSVita);
+            break;
+
+          case 'PS3':
+            platforms.push(Platform.PS3);
+            break;
+
+          case 'PS4':
+            platforms.push(Platform.PS4);
+            break;
+
+          case 'PS5':
+            platforms.push(Platform.PS5);
+            break;
+        }
       }
 
-      const gameId = /(\d+)/.exec(href.value);
-      if (gameId !== null) {
-        games.push(gameId[0]);
+      const _2ndTd = e.querySelectorAll('td:nth-child(2)');
+      console.log(_2ndTd);
+
+      for (const element of _2ndTd) {
+        const link = element.querySelector('a.title');
+        if (link === null) {
+          continue;
+        }
+
+        const href = link.attributes.getNamedItem('href');
+
+        if (href === null) {
+          continue;
+        }
+
+        const gameId = /(\d+)/.exec(href.value);
+        if (gameId === null) {
+          continue;
+        }
+
+        const lastTrophyStr = element.querySelector('div:last-child');
+        const lastTrophySanitized = (lastTrophyStr as HTMLElement).innerText
+          .split('•')[0]
+          .replace('st', '')
+          .replace('nd', '')
+          .replace('rd', '')
+          .replace('th', '');
+        const lastTrophy = new Date(lastTrophySanitized);
+
+        if (isNaN(lastTrophy.getTime())) {
+          continue;
+        }
+
+        const game: Game = {
+          trophyId: parseInt(gameId[0]),
+          title: (link as HTMLElement).innerText,
+          url: href.value,
+          lastTrophy,
+          platforms
+        };
+
+        this.storageModule.saveGame(game);
       }
     }
 
-    return games;
+    // const elements = document.querySelectorAll('#gamesTable > tbody tr > td:nth-child(2)');
   }
 
   setGuides (): void {
