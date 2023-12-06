@@ -11,12 +11,12 @@ export class ProfileGameModule {
   }
 
   setGames (): void {
-    const e2 = document.querySelectorAll('#gamesTable > tbody tr');
+    const elements = document.querySelectorAll('#gamesTable > tbody tr');
 
-    for (const e of e2) {
+    for (const element of elements) {
       const platforms: Platform[] = [];
 
-      for (const platform of e.querySelectorAll('td span.tag.platform')) {
+      for (const platform of element.querySelectorAll('td span.tag.platform')) {
         switch ((platform as HTMLElement).innerText.toUpperCase()) {
           case 'VITA':
             platforms.push(Platform.PSVita);
@@ -36,10 +36,9 @@ export class ProfileGameModule {
         }
       }
 
-      const _2ndTd = e.querySelectorAll('td:nth-child(2)');
-      console.log(_2ndTd);
+      const gameElement = element.querySelectorAll('td:nth-child(2)');
 
-      for (const element of _2ndTd) {
+      for (const element of gameElement) {
         const link = element.querySelector('a.title');
         if (link === null) {
           continue;
@@ -80,8 +79,6 @@ export class ProfileGameModule {
         this.storageModule.saveGame(game);
       }
     }
-
-    // const elements = document.querySelectorAll('#gamesTable > tbody tr > td:nth-child(2)');
   }
 
   setGuides (): void {

@@ -6,6 +6,7 @@ import { FormControl } from '../components/form-control';
 import { FormSelectControl } from '../components/form-select-control';
 import { GuideCheckableControl } from '../components/guide-checkable';
 import { type Guide } from '../models/guide';
+import { toString } from '../models/platform';
 import { StorageModule } from './storage-module';
 
 export class GuideModule {
@@ -108,11 +109,11 @@ export class GuideModule {
 
     const currentGame = (currentGameElement as HTMLElement).innerText;
 
-    const control = new FormSelectControl('psnp-e-load-trophies', 'Load trophies', (e) => { console.log((e.target as HTMLInputElement).value); }, true);
+    const control = new FormSelectControl('psnp-e-load-trophies', '', undefined, true);
 
     for (const game of this.storageModule.getGames()) {
       if (game.title.localeCompare(currentGame, undefined, { sensitivity: 'accent' }) === 0) {
-        control.addOption(`psnp-load-${game.trophyId}`, game.title);
+        control.addOption(game.url, `${game.title} (${game.platforms.map((p) => (toString(p))).join(', ')})`);
       }
     }
 
@@ -123,7 +124,47 @@ export class GuideModule {
       .appendAfter(new FormControl()
         .add(control)
         .add(new FormButtonGroupControl()
-          .addSingleButton(new FormButtonControl('Load trophies', 'green', (e) => { console.log(e); console.log(control.getValue()); }))));
+          .addSingleButton(new FormButtonControl('Load trophies', 'green', async (_) => { await this.loadTrophies(control.getValue()); }))));
+  }
+
+  private async loadTrophies (url: string | null): Promise<void> {
+    if (url === null) {
+      return;
+    }
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.error('Unable to retrieve trophy document', url);
+      return undefined;
+    }
+
+    // Retrieve earned trophies
+    const content = new DOMParser()
+      .parseFromString(await response.text(), 'text/html')
+      .body
+      .querySelectorAll('table.zebra tr.completed > td:nth-child(2) > a');
+
+    const trophies: string[] = [];
+    for (const trophy of content) {
+      const name = (trophy as HTMLElement).innerText;
+      trophies.push(name);
+    }
+
+    // Roadmap
+    const roadmap = document.querySelectorAll('div.roadmap-trophies div.trophy');
+    for (const trophy of roadmap) {
+      const aElement = trophy.querySelector('a.title');
+      if (aElement === null) {
+        continue;
+      }
+
+      const title = (aElement as HTMLElement).innerText;
+
+      if (trophies.some((t) => t.localeCompare(title, undefined, { sensitivity: 'accent' }) === 0)) {
+        trophy.classList.add('earned');
+      }
+    }
   }
 
   public makeCheckable (): void {
