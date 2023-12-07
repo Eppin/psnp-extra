@@ -7,4 +7,7 @@ export interface Guide {
   playthroughColor: string
   hours: number
   hoursColor: string
+
+  online: boolean
+  buggy: boolean
 }

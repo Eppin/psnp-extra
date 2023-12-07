@@ -1,7 +1,8 @@
 import { DropdownMenu } from './components/dropdown-menu';
-import { GuideModule } from './modules/guide-module';
+import { GuideModule } from './modules/guide/guide-module';
 import { ProfileGameModule } from './modules/profile-game-module';
-import { StorageModule } from './modules/storage-module';
+import { guidesKey } from './modules/storage/storage-keys';
+import { StorageModule } from './modules/storage/storage-module';
 
 console.log('Starting PSNProfiles Extra');
 
@@ -10,20 +11,20 @@ if (paths.length >= 1) {
   switch (paths[1]) {
     case 'trophies': {
       const guideModule = new GuideModule();
-      const guide = await guideModule.getGuide();
+      const guide = await guideModule.get.guide();
 
       if (guide !== undefined) {
         const storageModule = new StorageModule();
-        storageModule.saveGuide(guide);
+        storageModule.save(guidesKey, guide, (s, i) => s.trophyId === i.trophyId && s.guideId === i.guideId);
       }
       break;
     }
 
     case 'guide': {
       const guideModule = new GuideModule();
-      guideModule.makeCheckable();
-      guideModule.addTrophyLoader();
-      guideModule.addSettings();
+      guideModule.checkable.makeCheckable();
+      guideModule.trophyLoader.addTrophyLoader();
+      guideModule.settings.addSettings();
       break;
     }
 

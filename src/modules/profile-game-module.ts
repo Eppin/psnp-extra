@@ -1,7 +1,9 @@
 import { BaseControl } from '../components/base-control';
 import { type Game } from '../models/game';
+import { type Guide } from '../models/guide';
 import { Platform } from '../models/platform';
-import { StorageModule } from './storage-module';
+import { gamesKey, guidesKey } from './storage/storage-keys';
+import { StorageModule } from './storage/storage-module';
 
 export class ProfileGameModule {
   private readonly storageModule: StorageModule;
@@ -10,7 +12,7 @@ export class ProfileGameModule {
     this.storageModule = new StorageModule();
   }
 
-  setGames (): void {
+  public setGames (): void {
     const elements = document.querySelectorAll('#gamesTable > tbody tr');
 
     for (const element of elements) {
@@ -76,12 +78,12 @@ export class ProfileGameModule {
           platforms
         };
 
-        this.storageModule.saveGame(game);
+        this.storageModule.save(gamesKey, game, (s, i) => s.trophyId === i.trophyId);
       }
     }
   }
 
-  setGuides (): void {
+  public setGuides (): void {
     const elements = document.querySelectorAll('#gamesTable > tbody a.title');
 
     for (const element of elements) {
@@ -96,7 +98,7 @@ export class ProfileGameModule {
         continue;
       }
 
-      const guides = this.storageModule.getGuides(parseInt(gameId[0]));
+      const guides = this.storageModule.get<Guide>(guidesKey, (g) => g.trophyId === parseInt(gameId[0]));
       if (guides.length === 0) {
         continue;
       }

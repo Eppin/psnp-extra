@@ -103,8 +103,6 @@ export class TitleControl extends BaseControl {
       .append(new BaseControl('h3')
         .setClass('grow')
         .setInnerText(title));
-
-    console.log(this.node);
   }
 }
 
