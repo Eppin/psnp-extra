@@ -99,5 +99,19 @@ export class TrophyLoader {
         e.classList.add('earned');
       }
     });
+
+    // Tree
+    this.getTrophies.tree(false).forEach((e) => {
+      const aElement = e.querySelector('a');
+      if (aElement === null) {
+        return;
+      }
+
+      const title = (aElement as HTMLElement).innerText;
+
+      if (trophies.some((t) => t.localeCompare(title, undefined, { sensitivity: 'accent' }) === 0)) {
+        e.classList.add('earned');
+      }
+    });
   }
 }
