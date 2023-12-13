@@ -1,4 +1,5 @@
 # PSNProfiles Extra
+![License](https://img.shields.io/badge/License-AGPLv3-blue.svg)
 
 This is an open source project to add additional features to PSNProfiles.com by creating a plugin for various browsers. I'm working on this project for personal purposes and it's my goal to learn how to create a browser extensions and NOT to imitate and/or create a copy of existing extensions.
 
