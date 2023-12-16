@@ -1,8 +1,7 @@
-import { GuideCheckableControl } from '../components/guide-checkable';
-import { type Guide } from '../models/guide';
+import { type Guide } from '../../models/guide';
 
-export class GuideModule {
-  public async getGuide (): Promise<Guide | undefined> {
+export class GetGuide {
+  public async guide (): Promise<Guide | undefined> {
     const trophyId = /(\d+)/.exec(window.location.href)?.[0];
 
     if (trophyId === undefined) {
@@ -38,6 +37,17 @@ export class GuideModule {
     const playthrough = this.getOverviewElement(overview, 1);
     const hours = this.getOverviewElement(overview, 2);
 
+    const online = body.querySelectorAll('.invisible.tags .Connectivity').length > 0;
+
+    let buggy = false;
+    for (const status of body.querySelectorAll('.invisible.tags .Status')) {
+      buggy = (status as HTMLElement).innerText.localeCompare('buggy', undefined, { sensitivity: 'accent' }) === 0;
+
+      if (buggy) {
+        break;
+      }
+    }
+
     return {
       trophyId: parseInt(trophyId),
       guideId: parseInt(guideId),
@@ -49,7 +59,10 @@ export class GuideModule {
       playthroughColor: playthrough[1],
 
       hours: hours[0],
-      hoursColor: hours[1]
+      hoursColor: hours[1],
+
+      online,
+      buggy
     };
   }
 
@@ -75,23 +88,5 @@ export class GuideModule {
     return new DOMParser()
       .parseFromString(await response.text(), 'text/html')
       .body;
-  }
-
-  public makeCheckable (): void {
-    const guideId = /(\d+)/.exec(window.location.href)?.[0];
-
-    if (guideId === undefined) {
-      console.error('Unable to determine guide ID from URL');
-      return;
-    }
-
-    const lists = '#content ul > li';
-    const tables = '#content table > tbody > tr';
-
-    document.querySelectorAll(`${lists}, ${tables}`)
-      .forEach((element, index) => {
-        const guideCheckableControl = new GuideCheckableControl(element as HTMLElement, parseInt(guideId), index);
-        guideCheckableControl.load();
-      });
   }
 }

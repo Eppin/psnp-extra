@@ -1,4 +1,4 @@
-import { StorageModule } from '../modules/storage-module';
+import { StorageModule } from '../modules/storage/storage-module';
 import { BaseControl } from './base-control';
 
 export class GuideCheckableControl extends BaseControl {
@@ -23,12 +23,12 @@ export class GuideCheckableControl extends BaseControl {
         this.checked = !this.checked;
         this.changeClass();
 
-        this.storageModule.setGuideChecked(guideId, index, this.checked);
+        this.storageModule.guide.setChecked(guideId, index, this.checked);
       });
   }
 
   public load (): void {
-    this.checked = this.storageModule.getGuideChecked(this.guideId, this.index);
+    this.checked = this.storageModule.guide.getChecked(this.guideId, this.index);
     this.changeClass();
   }
 
