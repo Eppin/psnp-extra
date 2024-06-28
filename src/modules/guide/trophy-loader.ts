@@ -19,6 +19,19 @@ export class TrophyLoader {
     this.getTrophies = new GetTrophies();
   }
 
+  public setOverviewClass (): void {
+    const trophies: string[] = [];
+    for (const trophy of this.getTrophies.tree(true)) {
+      trophies.push(trophy.innerText);
+    }
+
+    this.getTrophies.overview().forEach((e) => {
+      if (trophies.some((t) => t.localeCompare(e.innerText, undefined, { sensitivity: 'accent' }) === 0)) {
+        e.classList.add('psnp-e-overview-earned');
+      }
+    });
+  }
+
   public addTrophyLoader (): void {
     const currentGameElement = document.querySelector('.guide-info ~ div.title-bar.flex.v-align > h3 > a:last-of-type');
     if (currentGameElement === null) {
@@ -69,6 +82,13 @@ export class TrophyLoader {
       const name = (trophy as HTMLElement).innerText;
       trophies.push(name);
     }
+
+    // Overview
+    this.getTrophies.overview().forEach((e) => {
+      if (trophies.some((t) => t.localeCompare(e.innerText, undefined, { sensitivity: 'accent' }) === 0)) {
+        e.classList.add('psnp-e-overview-earned');
+      }
+    });
 
     // Section
     this.getTrophies.section(false).forEach((e) => {
