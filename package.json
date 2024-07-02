@@ -20,7 +20,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "copy-webpack-plugin": "^12.0.2",
     "eslint": "^8.57.0",
-    "eslint-config-standard-with-typescript": "^43.0.1",
+    "eslint-config-love": "^53.0.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.4.0",
