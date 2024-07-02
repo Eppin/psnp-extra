@@ -1,7 +1,9 @@
-const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const webpack = require('webpack');
-const package = require('./package.json');
+import { join } from 'path';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import packageJson from './package.json' with { type: 'json' };
+
+import pkg from 'webpack';
+const { ProgressPlugin } = pkg;
 
 const buildTargets = [ 'firefox', 'chrome', 'safari' ];
 
@@ -11,7 +13,7 @@ const sanitizeEnv = (value, defaultValue = '') =>
     .replace(/[^a-z0-9\.\,\-]+/gi, '')
     .replace(/\s+/g, '-');
 
-module.exports = (envWebpack) => {
+export default (envWebpack) => {
   const __DEV__ = process.env.NODE_ENV !== 'production';
   const mode = __DEV__ ? 'development' : 'production';
 
@@ -23,10 +25,10 @@ module.exports = (envWebpack) => {
       buildTargets[0] ?? 'firefox'
     ),
     NODE_ENV: mode,
-    PACKAGE_AUTHOR_NAME: package.author,
-    PACKAGE_DESCRIPTION: package.description,
-    PACKAGE_NAME: package.name,
-    PACKAGE_VERSION: package.version
+    PACKAGE_AUTHOR_NAME: packageJson.author,
+    PACKAGE_DESCRIPTION: packageJson.description,
+    PACKAGE_NAME: packageJson.name,
+    PACKAGE_VERSION: packageJson.version
   };
 
   const copyPatterns = [
@@ -65,7 +67,7 @@ module.exports = (envWebpack) => {
   ];
 
   const plugins = [
-    new webpack.ProgressPlugin(),
+    new ProgressPlugin(),
     new CopyWebpackPlugin({ patterns: copyPatterns })
   ];
 
@@ -87,7 +89,7 @@ module.exports = (envWebpack) => {
     },
     output: {
       filename: 'bundle.js',
-      path: path.join(__dirname, __DEV__ ? 'build' : 'dist', env.BUILD_TARGET)
+      path: join(import.meta.dirname, __DEV__ ? 'build' : 'dist', env.BUILD_TARGET)
     },
     plugins
   };
