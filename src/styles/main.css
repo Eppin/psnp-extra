@@ -10,3 +10,8 @@
 .psnp-e-checked > td {
   color: lightgray !important;
 }
+
+.psnp-e-overview-earned {
+  background-color: #ecf8ea;
+	border: 1px solid #b5daaf;
+}

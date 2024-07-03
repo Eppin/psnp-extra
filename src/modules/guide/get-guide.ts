@@ -1,3 +1,4 @@
+import { fetchBody } from '../../extensions/fetch-body';
 import { type Guide } from '../../models/guide';
 
 export class GetGuide {
@@ -25,7 +26,7 @@ export class GetGuide {
       return;
     }
 
-    const body = await this.getGuideBody(guideUrl);
+    const body = await fetchBody(guideUrl);
 
     if (body === undefined) {
       return;
@@ -75,18 +76,5 @@ export class GetGuide {
     const valueColor = elements[index].parentElement?.attributes.getNamedItem('style')?.value ?? 'background-color: #7393B3';
 
     return [ value, valueColor ];
-  }
-
-  private async getGuideBody (url: string): Promise<HTMLElement | undefined> {
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      console.error('Unable to retrieve guide document', url);
-      return undefined;
-    }
-
-    return new DOMParser()
-      .parseFromString(await response.text(), 'text/html')
-      .body;
   }
 }

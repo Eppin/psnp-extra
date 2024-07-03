@@ -1,3 +1,5 @@
+import { type Description } from '../../models/description';
+
 export class GetTrophies {
   public overview (): NodeListOf<HTMLElement> {
     return document.querySelectorAll('div.guide.overview a[href]');
@@ -32,5 +34,25 @@ export class GetTrophies {
     }
 
     return document.querySelectorAll(classes);
+  }
+
+  public descriptions (body: Element): Description[] {
+    const descriptions: Description[] = [];
+
+    body.querySelectorAll('[id*="SectionContainer"]').forEach((e) => {
+      const title = (e.querySelector('.title') as HTMLElement)?.innerText;
+
+      if (title === undefined) {
+        return;
+      }
+
+      const description = e.querySelector('.section-original');
+
+      if (description !== null) {
+        descriptions.push({ title, body: description as HTMLElement });
+      }
+    });
+
+    return descriptions;
   }
 }
