@@ -1,6 +1,7 @@
 import { join } from 'path';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import packageJson from './package.json' with { type: 'json' };
+import manifest from './src/manifest.json' assert { type: 'json' };
 
 import pkg from 'webpack';
 const { ProgressPlugin } = pkg;
@@ -63,7 +64,10 @@ export default (envWebpack) => {
         return Buffer.from(JSON.stringify(parsed));
       }
     },
-    { from: './src/styles/*.css', to: '[name][ext]' }
+    { from: './src/styles/*.css', to: '[name][ext]' },
+    { from: './src/assets/**/*', to: '[name][ext]', filter: (path) => [
+      ...Object.values(manifest.icons),
+    ].some((name) => path.includes(name)) }
   ];
 
   const plugins = [

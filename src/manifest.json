@@ -6,6 +6,14 @@
   "description": "<-- auto-filled -->",
   "author": "<-- auto-filled; do not edit -->",
 
+  "icons": {
+    "16": "trophy-16.png",
+    "24": "trophy-24.png",
+    "32": "trophy-32.png",
+    "64": "trophy-64.png",
+    "128": "trophy-128.png"
+ },
+
   "content_scripts": [
     {
       "matches": ["*://*.psnprofiles.com/*"],

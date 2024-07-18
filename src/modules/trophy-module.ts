@@ -1,5 +1,6 @@
 import { BaseControl } from '../components/base-control';
 import { fetchBody } from '../extensions/fetch-body';
+import { sleep } from '../extensions/sleep';
 import { stringEquals } from '../extensions/string-equals';
 import { type GuideOverview } from '../models/guide-overview';
 import { GetGuides } from './guide/get-guides';
@@ -89,6 +90,9 @@ export class TrophyModule {
           return;
         }
       }
+
+      /* Be nice and avoid getting 429 - too many requests error */
+      await sleep(750);
     }
   }
 
