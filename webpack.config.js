@@ -1,7 +1,7 @@
 import { join } from 'path';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import packageJson from './package.json' with { type: 'json' };
-import manifest from './src/manifest.json' assert { type: 'json' };
+import manifest from './src/manifest.json' with { type: 'json' };
 
 import pkg from 'webpack';
 const { ProgressPlugin } = pkg;
