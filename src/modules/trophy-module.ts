@@ -52,6 +52,8 @@ export class TrophyModule {
       return;
     }
 
+    const sleepDelay = guides.length > 4 ? 750 : 250;
+
     for (const guide of guides) {
       const body = await fetchBody(guide.url);
 
@@ -92,7 +94,7 @@ export class TrophyModule {
       }
 
       /* Be nice and avoid getting 429 - too many requests error */
-      await sleep(750);
+      await sleep(sleepDelay);
     }
   }
 
