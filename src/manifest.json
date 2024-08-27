@@ -23,7 +23,7 @@
   ],
 
   "action": {},
-  "permissions": ["storage"],
+  "permissions": [],
   "host_permissions": ["*://*.psnprofiles.com/*"],
 
   "browser_specific_settings": {
