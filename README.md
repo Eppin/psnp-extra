@@ -47,4 +47,4 @@ Follow the steps of the preferred browser to select the `manifest.json` and run 
 1. Navigate to the Addons debugging page (`about:debugging#/runtime/this-firefox`).
 2. Search cog-icon and navigate to **Debug Add-ons**.
 3. Verify that the **Temporary Extensions** section and the **Load Temporary Add-on...** option are available.
-4. Select the `manifest.json` in the `chrome` folder of `dist` (regular build) or `build` (watch build)
+4. Select the `manifest.json` in the `firefox` folder of `dist` (regular build) or `build` (watch build)
