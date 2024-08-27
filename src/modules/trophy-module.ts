@@ -1,5 +1,6 @@
 import { BaseControl } from '../components/base-control';
 import { fetchBody } from '../extensions/fetch-body';
+import { sleep } from '../extensions/sleep';
 import { stringEquals } from '../extensions/string-equals';
 import { type GuideOverview } from '../models/guide-overview';
 import { GetGuides } from './guide/get-guides';
@@ -51,6 +52,8 @@ export class TrophyModule {
       return;
     }
 
+    const sleepDelay = guides.length > 4 ? 750 : 250;
+
     for (const guide of guides) {
       const body = await fetchBody(guide.url);
 
@@ -89,6 +92,9 @@ export class TrophyModule {
           return;
         }
       }
+
+      /* Be nice and avoid getting 429 - too many requests error */
+      await sleep(sleepDelay);
     }
   }
 

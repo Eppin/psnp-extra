@@ -1,6 +1,8 @@
 import { join } from 'path';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import ZipPlugin from 'zip-webpack-plugin';
 import packageJson from './package.json' with { type: 'json' };
+import manifest from './src/manifest.json' with { type: 'json' };
 
 import pkg from 'webpack';
 const { ProgressPlugin } = pkg;
@@ -28,8 +30,19 @@ export default (envWebpack) => {
     PACKAGE_AUTHOR_NAME: packageJson.author,
     PACKAGE_DESCRIPTION: packageJson.description,
     PACKAGE_NAME: packageJson.name,
-    PACKAGE_VERSION: packageJson.version
+    PACKAGE_VERSION: packageJson.version,
+    PACKAGE_VERSION_SUFFIX: sanitizeEnv(process.env.PACKAGE_VERSION_SUFFIX),
   };
+
+  env.BUILD_NAME = [
+    env.PACKAGE_NAME,
+    `-v${env.PACKAGE_VERSION || 'X.X.X'}`,
+    !!env.PACKAGE_VERSION_SUFFIX && `-${env.PACKAGE_VERSION_SUFFIX}`,
+    !!env.BUILD_DATE && `-b${env.BUILD_DATE}`,
+    !!env.BUILD_SUFFIX && `-${env.BUILD_SUFFIX}`,
+    __DEV__ && '-dev',
+    `.${env.BUILD_TARGET}`,
+  ].filter(Boolean).join('');
 
   const copyPatterns = [
     {
@@ -63,13 +76,25 @@ export default (envWebpack) => {
         return Buffer.from(JSON.stringify(parsed));
       }
     },
-    { from: './src/styles/*.css', to: '[name][ext]' }
+    { from: './src/styles/*.css', to: '[name][ext]' },
+    { from: './src/assets/**/*', to: '[name][ext]', filter: (path) => [
+      ...Object.values(manifest.icons),
+    ].some((name) => path.includes(name)) }
   ];
 
   const plugins = [
     new ProgressPlugin(),
-    new CopyWebpackPlugin({ patterns: copyPatterns })
+    new CopyWebpackPlugin({ patterns: copyPatterns }),
   ];
+
+  if (!__DEV__ && env.BUILD_TARGET !== 'safari') {
+    plugins.push(new ZipPlugin({
+      path: '..',
+
+      filename: env.BUILD_NAME,
+      extension: env.BUILD_TARGET === 'firefox' ? 'xpi' : 'zip',
+    }));
+  }
 
   return {
     entry: './src/index.ts',
