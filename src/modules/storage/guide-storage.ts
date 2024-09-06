@@ -1,18 +1,7 @@
-import { type Guide } from '../../models/guide';
 import { type GuideChecked } from '../../models/guide-checked';
-import { guidesCheckedKey, guidesKey } from './storage-keys';
+import { guidesCheckedKey } from './storage-keys';
 
 export class GuideStorage {
-  public getGuides (trophyId: number): Guide[] {
-    const guidesStr = localStorage.getItem(guidesKey);
-    if (guidesStr === null) {
-      return [];
-    }
-
-    const guides: Guide[] = JSON.parse(guidesStr);
-    return guides.filter((g) => g.trophyId === trophyId);
-  }
-
   public setChecked (guideId: number, key: number, checked: boolean): void {
     const guidesCheckedStr = localStorage.getItem(guidesCheckedKey);
     if (guidesCheckedStr === null) {

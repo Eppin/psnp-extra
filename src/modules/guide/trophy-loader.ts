@@ -43,7 +43,12 @@ export class TrophyLoader {
 
     const control = new FormSelectControl('psnp-e-load-trophies', '', undefined, true);
 
-    for (const game of this.storageModule.get<Game>(gamesKey)) {
+    const games = this.storageModule.get<Game[]>(gamesKey);
+    if (games === null) {
+      return;
+    }
+
+    for (const game of games) {
       if (game.title.localeCompare(currentGame, undefined, { sensitivity: 'accent' }) === 0) {
         control.addOption(game.url, `${game.title} (${game.platforms.map((p) => (platformToString(p))).join(', ')})`);
       }

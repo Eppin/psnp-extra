@@ -2,16 +2,16 @@ import { BaseControl } from '../components/base-control';
 import { fetchBody } from '../extensions/fetch-body';
 import { sleep } from '../extensions/sleep';
 import { stringEquals } from '../extensions/string-equals';
-import { type GuideOverview } from '../models/guide-overview';
-import { GetGuides } from './guide/get-guides';
+import { Guide } from '../models/guide';
+import { Guides } from '../models/guides';
 import { GetTrophies } from './guide/get-trophies';
+import { guidesKey } from './storage/storage-keys';
+import { StorageModule } from './storage/storage-module';
 
 export class TrophyModule {
-  private readonly getGuides: GetGuides;
   private readonly getTrophies: GetTrophies;
 
   constructor () {
-    this.getGuides = new GetGuides();
     this.getTrophies = new GetTrophies();
   }
 
@@ -21,21 +21,15 @@ export class TrophyModule {
       return;
     }
 
-    let guideUrl: undefined | string;
-    document.querySelectorAll('ul.navigation > li > a').forEach((e) => {
-      const html = e as HTMLElement;
+    const href = document.querySelector('ul.navigation > li > a')?.attributes.getNamedItem('href')?.value;
 
-      if (stringEquals(html.innerText, 'Guides')) {
-        const href = e.attributes.getNamedItem('href');
+    if (href === undefined) {
+      return;
+    }
 
-        if (href !== null) {
-          guideUrl = href.value;
-        }
-      }
-    });
-
-    if (guideUrl === undefined) {
-      console.warn('Unable to find guide URL');
+    const trophyId = /(\d+)/.exec(href);
+    if (trophyId === null) {
+      console.warn('Unable to find trophy ID');
       return;
     }
 
@@ -45,7 +39,7 @@ export class TrophyModule {
       return;
     }
 
-    const guides = await this.getGuides.guides(guideUrl);
+    const guides = new StorageModule().get<Guides>(guidesKey)?.guides.filter((g) => g.trophy.find((t) => t === parseInt(trophyId[0])));
 
     if (guides === undefined) {
       console.warn('Unable to find guides');
@@ -55,7 +49,8 @@ export class TrophyModule {
     const sleepDelay = guides.length > 4 ? 750 : 250;
 
     for (const guide of guides) {
-      const body = await fetchBody(guide.url);
+      const guideUrl = `/guide/${guide.id}`;
+      const body = await fetchBody(guideUrl);
 
       if (body !== undefined) {
         const description = this.getTrophies.descriptions(body).filter((e) => stringEquals(e.title, trophyName));
@@ -69,6 +64,7 @@ export class TrophyModule {
           }
 
           // Recreate document, to be able to split the innerHTML
+          // TODO replace this part...
           const guideDocument = document
             .createRange()
             .createContextualFragment(description[0].body.innerHTML)
@@ -98,17 +94,17 @@ export class TrophyModule {
     }
   }
 
-  private buildGuideInfoBar (guide: GuideOverview): BaseControl {
+  private buildGuideInfoBar (guide: Guide): BaseControl {
     return new BaseControl('div')
       .setClass('cf')
       .append(new BaseControl('div')
         .setClass('guide-page-info', 'sm')
         .setStyle('margin-bottom: 0')
         .append(new BaseControl('a')
-          .setAttribute('href', guide.url)
+          .setAttribute('href', `/guide/${guide.id}`)
           .append(new BaseControl('div')
             .setClass('background')
-            .setStyle(guide.background)
+            .setStyle(guide.bg)
             .append(new BaseControl('div')
               .setClass('shade')
               .setStyle('text-align: left')
@@ -124,7 +120,7 @@ export class TrophyModule {
                     .setClass('info')
                     .append(new BaseControl('span')
                       .setStyle('line-clamp', 'two')
-                      .setInnerText(`${guide.author}`))))
+                      .setInnerText('${guide.authors}')))) // TODO
                 .append(new BaseControl('div')
                   .setClass('no-shrink')
                   .append(new BaseControl('div')
@@ -133,17 +129,17 @@ export class TrophyModule {
                       .append(new BaseControl('center')
                         .setStyle('padding: 0 10px 0 10px', 'border-right:1px solid rgba(255,255,255,.3)')
                         .append(new BaseControl('span')
-                          .setClass(...guide.rating.split(' ')))
+                          .setClass(guide.data[1].toString()))
                         .append(new BaseControl('br'))
                         .append(new BaseControl('span')
                           .setClass('typo-bottom')
-                          .setInnerText(guide.ratings))))
+                          .setInnerText(guide.data[2].toString()))))
                     .append(new BaseControl('div')
                       .append(new BaseControl('center')
                         .setStyle('padding: 0 10px 0 10px', 'border-right:1px solid rgba(255,255,255,.3)')
                         .append(new BaseControl('span')
                           .setClass('typo-top')
-                          .setInnerText(guide.views))
+                          .setInnerText(guide.data[3].toString()))
                         .append(new BaseControl('br'))
                         .append(new BaseControl('span')
                           .setClass('typo-bottom')
@@ -153,7 +149,7 @@ export class TrophyModule {
                         .setStyle('padding: 0 10px 0 10px')
                         .append(new BaseControl('span')
                           .setClass('typo-top')
-                          .setInnerText(guide.favorites))
+                          .setInnerText(guide.data[0].toString()))
                         .append(new BaseControl('br'))
                         .append(new BaseControl('span')
                           .setClass('typo-bottom')
