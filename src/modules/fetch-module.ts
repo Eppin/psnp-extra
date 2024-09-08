@@ -21,7 +21,7 @@ export class FetchModule {
     if (get === null || yesterday >= get.created) {
       await fetch(github)
         .then((r) => r.json())
-        .then((g: Guide[]) => this.storage.add<Guides>(guidesKey, { guides: g, created: new Date().getTime() }));
+        .then((guides: Guide[]) => this.storage.add<Guides>(guidesKey, { guides, created: new Date().getTime() }));
     }
   }
 }

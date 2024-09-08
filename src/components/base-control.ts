@@ -75,6 +75,11 @@ export class BaseControl {
     return this;
   }
 
+  public setInnerHTML(text: string) : BaseControl {
+    this.node.innerHTML = text;
+    return this;
+  }
+
   public setStyle (...style: string[]): BaseControl {
     this.node.setAttribute('style', style.join(';'));
     return this;
