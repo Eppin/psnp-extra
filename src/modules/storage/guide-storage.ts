@@ -1,18 +1,8 @@
-import { type Guide } from '../../models/guide';
+import { parseJSON } from '../../extensions/json-parse';
 import { type GuideChecked } from '../../models/guide-checked';
-import { guidesCheckedKey, guidesKey } from './storage-keys';
+import { guidesCheckedKey } from './storage-keys';
 
 export class GuideStorage {
-  public getGuides (trophyId: number): Guide[] {
-    const guidesStr = localStorage.getItem(guidesKey);
-    if (guidesStr === null) {
-      return [];
-    }
-
-    const guides: Guide[] = JSON.parse(guidesStr);
-    return guides.filter((g) => g.trophyId === trophyId);
-  }
-
   public setChecked (guideId: number, key: number, checked: boolean): void {
     const guidesCheckedStr = localStorage.getItem(guidesCheckedKey);
     if (guidesCheckedStr === null) {
@@ -21,7 +11,7 @@ export class GuideStorage {
         localStorage.setItem(guidesCheckedKey, JSON.stringify([ guide ]));
       }
     } else {
-      const guides: GuideChecked[] = JSON.parse(guidesCheckedStr);
+      const guides: GuideChecked[] = parseJSON<GuideChecked[]>(guidesCheckedStr);
 
       const index = guides.findIndex((t) => t.guideId === guideId);
       if (index >= 0) {
@@ -46,7 +36,7 @@ export class GuideStorage {
     if (guidesCheckedStr === null) {
       return false;
     } else {
-      const guides: GuideChecked[] = JSON.parse(guidesCheckedStr);
+      const guides: GuideChecked[] = parseJSON<GuideChecked[]>(guidesCheckedStr);
 
       const index = guides.findIndex((t) => t.guideId === guideId);
       if (index >= 0) {

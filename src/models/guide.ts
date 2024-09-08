@@ -1,13 +1,14 @@
-export interface Guide {
-  guideId: number
-  trophyId: number
-  difficulty: number
-  difficultyColor: string
-  playthrough: number
-  playthroughColor: string
-  hours: number
-  hoursColor: string
+import { Extra } from './extra';
 
-  online: boolean
-  buggy: boolean
+export interface Guide {
+    id: number
+    trophy: number[]
+    title: string
+    bg: string
+    authors: string[]
+    data: number[]
+    view: number[]
+    extra: Extra;
+    published: number
+    updated?: number
 }

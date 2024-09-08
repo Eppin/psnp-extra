@@ -1,18 +1,21 @@
 import { BaseControl } from '../components/base-control';
 import { fetchBody } from '../extensions/fetch-body';
+import { guideDate } from '../extensions/guide-date';
 import { sleep } from '../extensions/sleep';
 import { stringEquals } from '../extensions/string-equals';
-import { type GuideOverview } from '../models/guide-overview';
-import { GetGuides } from './guide/get-guides';
+import { Guide } from '../models/guide';
+import { Guides } from '../models/guides';
 import { GetTrophies } from './guide/get-trophies';
+import { guidesKey } from './storage/storage-keys';
+import { StorageModule } from './storage/storage-module';
 
 export class TrophyModule {
-  private readonly getGuides: GetGuides;
   private readonly getTrophies: GetTrophies;
+  private readonly storageModule: StorageModule;
 
   constructor () {
-    this.getGuides = new GetGuides();
     this.getTrophies = new GetTrophies();
+    this.storageModule = new StorageModule();
   }
 
   public async getGuide (): Promise<void> {
@@ -21,21 +24,15 @@ export class TrophyModule {
       return;
     }
 
-    let guideUrl: undefined | string;
-    document.querySelectorAll('ul.navigation > li > a').forEach((e) => {
-      const html = e as HTMLElement;
+    const href = document.querySelector('ul.navigation > li > a')?.attributes.getNamedItem('href')?.value;
 
-      if (stringEquals(html.innerText, 'Guides')) {
-        const href = e.attributes.getNamedItem('href');
+    if (href === undefined) {
+      return;
+    }
 
-        if (href !== null) {
-          guideUrl = href.value;
-        }
-      }
-    });
-
-    if (guideUrl === undefined) {
-      console.warn('Unable to find guide URL');
+    const trophyId = /(\d+)/.exec(href);
+    if (trophyId === null) {
+      console.warn('Unable to find trophy ID');
       return;
     }
 
@@ -45,7 +42,7 @@ export class TrophyModule {
       return;
     }
 
-    const guides = await this.getGuides.guides(guideUrl);
+    const guides = this.storageModule.get<Guides>(guidesKey)?.guides.filter((g) => g.trophy.find((t) => t === parseInt(trophyId[0])));
 
     if (guides === undefined) {
       console.warn('Unable to find guides');
@@ -55,7 +52,8 @@ export class TrophyModule {
     const sleepDelay = guides.length > 4 ? 750 : 250;
 
     for (const guide of guides) {
-      const body = await fetchBody(guide.url);
+      const guideUrl = `/guide/${guide.id}`;
+      const body = await fetchBody(guideUrl);
 
       if (body !== undefined) {
         const description = this.getTrophies.descriptions(body).filter((e) => stringEquals(e.title, trophyName));
@@ -68,15 +66,9 @@ export class TrophyModule {
             return;
           }
 
-          // Recreate document, to be able to split the innerHTML
-          const guideDocument = document
-            .createRange()
-            .createContextualFragment(description[0].body.innerHTML)
-            .children;
-
           // If there are no tags, the first block will contain the description
-          const tagsOrContent = guideDocument[0] as HTMLElement;
-          const content = guideDocument[1] as HTMLElement;
+          const tagsOrContent = description[0].body.children[0] as HTMLElement;
+          const content = description[0].body.children[1] as HTMLElement;
 
           const guideBlock = new BaseControl(boxZebra as HTMLElement)
             .append(this.buildGuideInfoBar(guide))
@@ -98,17 +90,17 @@ export class TrophyModule {
     }
   }
 
-  private buildGuideInfoBar (guide: GuideOverview): BaseControl {
+  private buildGuideInfoBar (guide: Guide): BaseControl {
     return new BaseControl('div')
       .setClass('cf')
       .append(new BaseControl('div')
         .setClass('guide-page-info', 'sm')
         .setStyle('margin-bottom: 0')
         .append(new BaseControl('a')
-          .setAttribute('href', guide.url)
+          .setAttribute('href', `/guide/${guide.id}`)
           .append(new BaseControl('div')
             .setClass('background')
-            .setStyle(guide.background)
+            .setStyle(`background-image: url('https://i.psnprofiles.com/games/${guide.bg}')`)
             .append(new BaseControl('div')
               .setClass('shade')
               .setStyle('text-align: left')
@@ -124,7 +116,7 @@ export class TrophyModule {
                     .setClass('info')
                     .append(new BaseControl('span')
                       .setStyle('line-clamp', 'two')
-                      .setInnerText(`${guide.author}`))))
+                      .setInnerHTML(this.getAuthorHTML(guide)))))
                 .append(new BaseControl('div')
                   .setClass('no-shrink')
                   .append(new BaseControl('div')
@@ -133,17 +125,17 @@ export class TrophyModule {
                       .append(new BaseControl('center')
                         .setStyle('padding: 0 10px 0 10px', 'border-right:1px solid rgba(255,255,255,.3)')
                         .append(new BaseControl('span')
-                          .setClass(...guide.rating.split(' ')))
+                          .setClass('rating-inline', `rating-${guide.data[1]}`))
                         .append(new BaseControl('br'))
                         .append(new BaseControl('span')
                           .setClass('typo-bottom')
-                          .setInnerText(guide.ratings))))
+                          .setInnerText(`${guide.data[2].toLocaleString('en-US')} Ratings`))))
                     .append(new BaseControl('div')
                       .append(new BaseControl('center')
                         .setStyle('padding: 0 10px 0 10px', 'border-right:1px solid rgba(255,255,255,.3)')
                         .append(new BaseControl('span')
                           .setClass('typo-top')
-                          .setInnerText(guide.views))
+                          .setInnerText(guide.data[3].toLocaleString('en-US')))
                         .append(new BaseControl('br'))
                         .append(new BaseControl('span')
                           .setClass('typo-bottom')
@@ -153,7 +145,7 @@ export class TrophyModule {
                         .setStyle('padding: 0 10px 0 10px')
                         .append(new BaseControl('span')
                           .setClass('typo-top')
-                          .setInnerText(guide.favorites))
+                          .setInnerText(guide.data[0].toLocaleString('en-US')))
                         .append(new BaseControl('br'))
                         .append(new BaseControl('span')
                           .setClass('typo-bottom')
@@ -174,5 +166,58 @@ export class TrophyModule {
     lazyYT.id = 'lazyYT';
     lazyYT.innerText = '$(\'.lazyYT\').lazyYT();';
     document.body.appendChild(lazyYT);
+  }
+
+  private getAuthorHTML(guide: Guide) : string {
+    const authors = guide.authors.join(', ').replace(/(.*,)/gm, '$1 and');
+
+    let baseStr = `Written by ${authors} <bullet>•</bullet> Published <b>${this.toDateString(guide.published)}</b>`;
+
+    if (guide.updated !== undefined) {
+      baseStr += ` <bullet>•</bullet> Updated <b>${this.toDateString(guide.published + guide.updated)}</b>`;
+    }
+
+    return baseStr;
+
+  }
+
+  private toDateString(unixTimestamp: number): string {
+    const date = guideDate(unixTimestamp);
+
+    const day = date.getDate();
+    const dayAbbreviation = this.getDayAbbreviation(day);
+
+    const month = this.getMonth(date.getMonth());
+    const year = date.getFullYear();
+
+    return `${day}${dayAbbreviation} ${month} ${year}`;
+  }
+
+  private getDayAbbreviation(day: number): string {
+    const j = day % 10, k = day % 100;
+
+    if (j === 1 && k !== 11) { return 'st'; }
+    if (j === 2 && k !== 12) { return 'nd'; }
+    if (j === 3 && k !== 13) { return 'rd'; }
+
+    return 'th';
+  }
+
+  private getMonth(month: number): string {
+    switch (month) {
+      case 0: return 'January';
+      case 1: return 'February';
+      case 2: return 'March';
+      case 3: return 'April';
+      case 4: return 'May';
+      case 5: return 'June';
+      case 6: return 'July';
+      case 7: return 'August';
+      case 8: return 'September';
+      case 9: return 'October';
+      case 10: return 'November';
+
+      default: return 'December';
+    }
   }
 }

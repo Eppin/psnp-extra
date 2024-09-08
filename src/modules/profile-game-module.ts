@@ -1,6 +1,9 @@
 import { BaseControl } from '../components/base-control';
+import { stringToExtra } from '../extensions/string-extra';
+import { Extra } from '../models/extra';
 import { type Game } from '../models/game';
-import { type Guide } from '../models/guide';
+import { Guide } from '../models/guide';
+import { Guides } from '../models/guides';
 import { Platform } from '../models/platform';
 import { gamesKey, guidesKey } from './storage/storage-keys';
 import { StorageModule } from './storage/storage-module';
@@ -78,34 +81,47 @@ export class ProfileGameModule {
           platforms
         };
 
-        this.storageModule.save(gamesKey, game, (s, i) => s.trophyId === i.trophyId);
+        this.storageModule.append(gamesKey, game, (s, i) => s.trophyId === i.trophyId);
       }
     }
   }
 
   public setGuides (): void {
-    const elements = document.querySelectorAll('#gamesTable > tbody a.title');
+    const elements = document.querySelectorAll('#gamesTable > tbody tr');
+
+    if (elements.length === 0) {
+      console.warn('Unable to find list of games');
+      return;
+    }
+
+    const guides = this.storageModule.get<Guides>(guidesKey)?.guides;
+    if (guides === undefined) {
+      console.warn('Guides aren\t cached, skipping');
+      return;
+    }
 
     for (const element of elements) {
-      const href = element.attributes.getNamedItem('href');
+      const href = element.querySelector('a.title')?.attributes.getNamedItem('href')?.value;
 
-      if (href === null) {
+      if (href === undefined) {
         continue;
       }
 
-      const gameId = /(\d+)/.exec(href.value);
-      if (gameId === null) {
+      const trophyId = /(\d+)/.exec(href);
+      if (trophyId === null) {
         continue;
       }
 
-      const guides = this.storageModule.get<Guide>(guidesKey, (g) => g.trophyId === parseInt(gameId[0]));
-      if (guides.length === 0) {
+      const platform = (element.querySelector('.platforms > .tag.platform') as HTMLElement).innerText;
+      const guide = this.findGuide(guides, parseInt(trophyId[0]), platform);
+
+      if (guide === undefined) {
         continue;
       }
 
-      const gameTitle = element.parentElement?.parentElement;
+      const gameTitle = element.querySelector('.small-info') as HTMLElement;
       if (gameTitle == null) {
-        console.warn('Couldn\'t find line which contains \'x of y Trophies\'', gameId[0]);
+        console.warn('Couldn\'t find line which contains \'x of y Trophies\'', trophyId[0]);
         continue;
       }
 
@@ -114,18 +130,69 @@ export class ProfileGameModule {
           .setClass('small-info')
           .setStyle('margin-top: 4px;')
           .append(new BaseControl('a')
-            .setAttribute('href', `/guide/${guides[0].guideId}`)
-            .append(this.guideElement(`${guides[0].difficulty}/10`, guides[0].difficultyColor))
+            .setAttribute('href', `/guide/${guide.id}`)
+            .append(this.guideElement(`${guide.view[0]}/10`, `psnp-e-difficulty-${guide.view[0]}`))
             .append(' ')
-            .append(this.guideElement(`${guides[0].playthrough}x`, guides[0].playthroughColor))
+            .append(this.guideElement(`${guide.view[1]}x`, this.getPlaythroughClass(guide.view[1])))
             .append(' ')
-            .append(this.guideElement(`${guides[0].hours}h`, guides[0].hoursColor))));
+            .append(this.guideElement(`${guide.view[2]}h`, this.getHourClass(guide.view[2])))
+          ));
     }
   }
 
-  private guideElement (value: string, color: string): BaseControl {
+  private guideElement (value: string, classColor: string): BaseControl {
     return new BaseControl('span')
       .setInnerText(value)
-      .setStyle(color, 'color: #fff', 'padding: 0 2px', 'border-radius: 2px');
+      .setClass(classColor)
+      .setStyle('color: #fff', 'padding: 0 2px', 'border-radius: 2px');
+  }
+
+  private findGuide (guides: Guide[], trophyId: number, platform: string): Guide | undefined {
+
+    const parsedPlatform = stringToExtra(platform);
+    if (parsedPlatform === undefined)
+      return undefined;
+
+    // Try to find a guide by trophy ID, platform and guide type
+    let guide = guides.find((g) => g.trophy.some((t) => t === trophyId) && ((g.extra & parsedPlatform) as Extra) === parsedPlatform && ((g.extra & Extra.Trophy) as Extra) === Extra.Trophy);
+
+    // If nothing found, then searching by platform
+    if (guide === undefined) {
+      guide = guides.find((g) => g.trophy.some((t) => t === trophyId) && ((g.extra & Extra.Trophy) as Extra) === Extra.Trophy);
+    }
+
+    return guide;
+  }
+
+  private getPlaythroughClass(playthrough: number): string {
+    const colorIndex = playthrough < 5 ? playthrough : 5;
+    return `psnp-e-playthrough-${colorIndex}`;
+  }
+
+  private getHourClass(hour: number): string {
+    // Largest possible color value
+    let colorIndex = 10;
+
+    if (hour < 10) {
+      colorIndex = 1;
+    } else if (hour < 20) {
+      colorIndex = 2;
+    } else if (hour < 30) {
+      colorIndex = 3;
+    } else if (hour < 40) {
+      colorIndex = 4;
+    } else if (hour < 50) {
+      colorIndex = 5;
+    } else if (hour < 60) {
+      colorIndex = 6;
+    } else if (hour < 70) {
+      colorIndex = 7;
+    } else if (hour < 80) {
+      colorIndex = 8;
+    } else if (hour < 90) {
+      colorIndex = 9;
+    }
+
+    return `psnp-e-hour-${colorIndex}`;
   }
 }
