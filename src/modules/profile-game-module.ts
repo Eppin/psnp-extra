@@ -153,8 +153,10 @@ export class ProfileGameModule {
     if (parsedPlatform === undefined)
       return undefined;
 
+    // Try to find a guide by trophy ID, platform and guide type
     let guide = guides.find((g) => g.trophy.some((t) => t === trophyId) && ((g.extra & parsedPlatform) as Extra) === parsedPlatform && ((g.extra & Extra.Trophy) as Extra) === Extra.Trophy);
 
+    // If nothing found, then searching by platform
     if (guide === undefined) {
       guide = guides.find((g) => g.trophy.some((t) => t === trophyId) && ((g.extra & Extra.Trophy) as Extra) === Extra.Trophy);
     }

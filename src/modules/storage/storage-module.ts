@@ -4,7 +4,7 @@ import { GuideStorage } from './guide-storage';
 export class StorageModule {
   public readonly guide: GuideStorage;
 
-  constructor() {
+  constructor () {
     this.guide = new GuideStorage();
   }
 

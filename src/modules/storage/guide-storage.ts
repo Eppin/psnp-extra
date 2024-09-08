@@ -1,3 +1,4 @@
+import { parseJSON } from '../../extensions/json-parse';
 import { type GuideChecked } from '../../models/guide-checked';
 import { guidesCheckedKey } from './storage-keys';
 
@@ -10,7 +11,7 @@ export class GuideStorage {
         localStorage.setItem(guidesCheckedKey, JSON.stringify([ guide ]));
       }
     } else {
-      const guides: GuideChecked[] = JSON.parse(guidesCheckedStr);
+      const guides: GuideChecked[] = parseJSON<GuideChecked[]>(guidesCheckedStr);
 
       const index = guides.findIndex((t) => t.guideId === guideId);
       if (index >= 0) {
@@ -35,7 +36,7 @@ export class GuideStorage {
     if (guidesCheckedStr === null) {
       return false;
     } else {
-      const guides: GuideChecked[] = JSON.parse(guidesCheckedStr);
+      const guides: GuideChecked[] = parseJSON<GuideChecked[]>(guidesCheckedStr);
 
       const index = guides.findIndex((t) => t.guideId === guideId);
       if (index >= 0) {

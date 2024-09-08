@@ -1,5 +1,6 @@
-import { join } from 'path';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import Dotenv from 'dotenv-webpack';
+import { join } from 'path';
 import ZipPlugin from 'zip-webpack-plugin';
 import packageJson from './package.json' with { type: 'json' };
 import manifest from './src/manifest.json' with { type: 'json' };
@@ -85,6 +86,7 @@ export default (envWebpack) => {
   const plugins = [
     new ProgressPlugin(),
     new CopyWebpackPlugin({ patterns: copyPatterns }),
+    new Dotenv({ path: './src/.env' })
   ];
 
   if (!__DEV__ && env.BUILD_TARGET !== 'safari') {

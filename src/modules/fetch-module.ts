@@ -3,8 +3,7 @@ import { Guides } from '../models/guides';
 import { guidesKey } from './storage/storage-keys';
 import { StorageModule } from './storage/storage-module';
 
-/* TODO: in a config file? */
-const github: string = 'https://raw.githubusercontent.com/Eppin/psnp-extra/feature/external-guide-data/external/guides.json';
+const github: string = process.env.FETCH_URI!;
 
 export class FetchModule {
   private readonly storage: StorageModule;
@@ -22,7 +21,7 @@ export class FetchModule {
     if (get === null || yesterday >= get.created) {
       await fetch(github)
         .then((r) => r.json())
-        .then((j: Guide[]) => this.storage.add<Guides>(guidesKey, { guides: j, created: new Date().getTime() }));
+        .then((g: Guide[]) => this.storage.add<Guides>(guidesKey, { guides: g, created: new Date().getTime() }));
     }
   }
 }
